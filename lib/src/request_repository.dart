@@ -7,10 +7,13 @@ class Request {
   Future<dynamic> post(
       {required String path,
       required String acessToken,
+      String? idempotencyKey,
       Map<String, dynamic> data = const {}}) async {
     try {
       _dio.options.headers["Authorization"] = "Bearer $acessToken";
       _dio.options.headers['content-Type'] = 'application/json';
+      if (idempotencyKey != null)
+        _dio.options.headers['X-Idempotency-Key'] = idempotencyKey;
 
       print(_url + path);
 

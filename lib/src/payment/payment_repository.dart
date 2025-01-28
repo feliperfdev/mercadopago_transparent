@@ -43,6 +43,7 @@ class PaymentRepository {
   ///[email], [name], [docNumber].
   Future<Payment> creditCard(
       {String? clientId,
+      String? idempotencyKey,
       required String tokenCard,
       required double amount,
       String? description,
@@ -72,7 +73,11 @@ class PaymentRepository {
       };
 
       final result = await request.post(
-          path: 'v1/payments', acessToken: acessToken, data: obj);
+        path: 'v1/payments',
+        acessToken: acessToken,
+        data: obj,
+        idempotencyKey: idempotencyKey,
+      );
 
       final payment = Payment.fromJson(result);
       return payment;
@@ -85,6 +90,7 @@ class PaymentRepository {
   Future<Payment> ticket(
       {String? description,
       String? clientId,
+      String? idempotencyKey,
       required double amount,
       required String name,
       required String email,
@@ -106,7 +112,11 @@ class PaymentRepository {
     };
 
     final result = await request.post(
-        path: 'v1/payments', acessToken: acessToken, data: data);
+      path: 'v1/payments',
+      acessToken: acessToken,
+      data: data,
+      idempotencyKey: idempotencyKey,
+    );
 
     final ticket = Payment.fromJson(result, ticket: true);
     return ticket;
@@ -116,6 +126,7 @@ class PaymentRepository {
   Future<Payment> pix(
       {String? description,
       String? clientId,
+      String? idempotencyKey,
       required double amount,
       required String name,
       required String email,
@@ -137,7 +148,11 @@ class PaymentRepository {
     };
 
     final result = await request.post(
-        path: 'v1/payments', acessToken: acessToken, data: data);
+      path: 'v1/payments',
+      acessToken: acessToken,
+      data: data,
+      idempotencyKey: idempotencyKey,
+    );
 
     final pix = Payment.fromJson(result, pix: true);
     return pix;
