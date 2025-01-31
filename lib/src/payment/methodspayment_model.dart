@@ -1,3 +1,5 @@
+import 'constants/methodspayment_constants.dart';
+
 class MethodsPayment {
   String? id;
   String? name;
@@ -22,30 +24,38 @@ class MethodsPayment {
   });
 
   factory MethodsPayment.fromJson(Map<String, dynamic> json) => MethodsPayment(
-        id: json["id"],
-        name: json["name"],
-        paymentTypeId: json["payment_type_id"],
-        status: json["status"],
-        image: json["thumbnail"],
-        maxAllowedAmount: json["max_allowed_amount"],
-        accreditationTime: json["accreditation_time"],
-        cardNumberLength: json["settings"].length > 0
-            ? json["settings"][0]["card_number"]["length"]
+        id: json[MethodsPaymentConstants.id],
+        name: json[MethodsPaymentConstants.name],
+        paymentTypeId: json[MethodsPaymentConstants.paymentTypeId],
+        status: json[MethodsPaymentConstants.status],
+        image: json[MethodsPaymentConstants.thumbnail],
+        maxAllowedAmount:
+            ((json[MethodsPaymentConstants.maxAllowedAmount] ?? 0) as num)
+                .toDouble(),
+        accreditationTime:
+            ((json[MethodsPaymentConstants.accreditationTime] ?? 0) as num)
+                .toInt(),
+        cardNumberLength: json[MethodsPaymentConstants.settings].length > 0
+            ? json[MethodsPaymentConstants.settings][0]
+                    [MethodsPaymentConstants.cardNumber]
+                [MethodsPaymentConstants.length]
             : 0,
-        securityCodeLength: json["settings"].length > 0
-            ? json["settings"][0]["security_code"]["length"]
+        securityCodeLength: json[MethodsPaymentConstants.settings].length > 0
+            ? json[MethodsPaymentConstants.settings][0]
+                    [MethodsPaymentConstants.securityCode]
+                [MethodsPaymentConstants.length]
             : 1,
       );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "payment_type_id": paymentTypeId,
-        "status": status,
-        "thumbnail": image,
-        "max_allowed_amount": maxAllowedAmount,
-        "accreditation_time": accreditationTime,
-        "cardNumberLength": cardNumberLength,
-        "securityCodeLength": securityCodeLength
+        MethodsPaymentConstants.id: id,
+        MethodsPaymentConstants.name: name,
+        MethodsPaymentConstants.paymentTypeId: paymentTypeId,
+        MethodsPaymentConstants.status: status,
+        MethodsPaymentConstants.thumbnail: image,
+        MethodsPaymentConstants.maxAllowedAmount: maxAllowedAmount,
+        MethodsPaymentConstants.accreditationTime: accreditationTime,
+        MethodsPaymentConstants.cardNumberLength: cardNumberLength,
+        MethodsPaymentConstants.securityCodeLength: securityCodeLength
       };
 }
