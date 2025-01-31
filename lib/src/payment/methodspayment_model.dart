@@ -6,7 +6,7 @@ class MethodsPayment {
   String? image;
   int? cardNumberLength;
   int? securityCodeLength;
-  int? maxAllowedAmount;
+  double? maxAllowedAmount;
   int? accreditationTime;
 
   MethodsPayment({
