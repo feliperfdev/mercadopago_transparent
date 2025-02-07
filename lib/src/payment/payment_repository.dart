@@ -145,15 +145,16 @@ class PaymentRepository {
     final data = {
       "transaction_amount": amount,
       "description": description ?? "",
-      "date_of_expiration":
-          DateFormat('yyyy-MM-dd HH:mm:ss.SSSz').format(DateTime.now().add(
-        durationToExpires ??
-            const Duration(
-              hours: 23,
-              minutes: 59,
-              seconds: 59,
-            ),
-      )),
+      "date_of_expiration": DateFormat('yyyy-MM-dd HH:mm:ss.SSSz')
+          .format(DateTime.now().add(
+            durationToExpires ??
+                const Duration(
+                  hours: 23,
+                  minutes: 59,
+                  seconds: 59,
+                ),
+          ))
+          .replaceFirst(' ', 'T'),
       "payment_method_id": 'pix',
       "payer": payer
     };
