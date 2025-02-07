@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:mercadopago_transparent/src/payment/methodspayment_model.dart';
 import 'package:mercadopago_transparent/src/payment/payment_model.dart';
 import 'package:mercadopago_transparent/src/request_repository.dart';
@@ -144,16 +145,15 @@ class PaymentRepository {
     final data = {
       "transaction_amount": amount,
       "description": description ?? "",
-      "date_of_expiration": DateTime.now()
-          .add(
-            durationToExpires ??
-                const Duration(
-                  hours: 23,
-                  minutes: 59,
-                  seconds: 59,
-                ),
-          )
-          .toIso8601String(),
+      "date_of_expiration":
+          DateFormat('yyyy-MM-dd HH:mm:ss.SSSz').format(DateTime.now().add(
+        durationToExpires ??
+            const Duration(
+              hours: 23,
+              minutes: 59,
+              seconds: 59,
+            ),
+      )),
       "payment_method_id": 'pix',
       "payer": payer
     };
