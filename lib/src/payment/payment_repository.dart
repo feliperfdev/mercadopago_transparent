@@ -127,7 +127,6 @@ class PaymentRepository {
       {String? description,
       String? clientId,
       String? idempotencyKey,
-      Duration? durationToExpires,
       required double amount,
       required String name,
       required String email,
@@ -144,16 +143,6 @@ class PaymentRepository {
     final data = {
       "transaction_amount": amount,
       "description": description ?? "",
-      "date_of_expiration": DateTime.now()
-          .add(
-            durationToExpires ??
-                const Duration(
-                  hours: 23,
-                  minutes: 59,
-                  seconds: 59,
-                ),
-          )
-          .toUtc(),
       "payment_method_id": 'pix',
       "payer": payer
     };
