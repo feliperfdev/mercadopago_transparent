@@ -2,6 +2,8 @@ import 'package:mercadopago_transparent/src/payment/methodspayment_model.dart';
 import 'package:mercadopago_transparent/src/payment/payment_model.dart';
 import 'package:mercadopago_transparent/src/request_repository.dart';
 
+import 'payment_item.dart';
+
 class PaymentRepository {
   final request = Request();
   final String acessToken;
@@ -44,6 +46,7 @@ class PaymentRepository {
   Future<Payment> creditCard(
       {String? clientId,
       String? idempotencyKey,
+      List<PaymentItem>? items,
       required String tokenCard,
       required double amount,
       String? description,
@@ -69,7 +72,13 @@ class PaymentRepository {
         'installments': 1,
         'payment_method_id': paymentMethodId,
         'issuer_id': issuer,
-        'payer': payer
+        'payer': payer,
+        "items": items
+                ?.map(
+                  (item) => item.toMap(),
+                )
+                .toList() ??
+            [],
       };
 
       final result = await request.post(
@@ -127,6 +136,7 @@ class PaymentRepository {
       {String? description,
       String? clientId,
       String? idempotencyKey,
+      List<PaymentItem>? items,
       required double amount,
       required String name,
       required String email,
@@ -144,7 +154,13 @@ class PaymentRepository {
       "transaction_amount": amount,
       "description": description ?? "",
       "payment_method_id": 'pix',
-      "payer": payer
+      "payer": payer,
+      "items": items
+              ?.map(
+                (item) => item.toMap(),
+              )
+              .toList() ??
+          [],
     };
 
     final result = await request.post(
