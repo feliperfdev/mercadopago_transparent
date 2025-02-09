@@ -73,12 +73,14 @@ class PaymentRepository {
         'payment_method_id': paymentMethodId,
         'issuer_id': issuer,
         'payer': payer,
-        "items": items
-                ?.map(
-                  (item) => item.toMap(),
-                )
-                .toList() ??
-            [],
+        "additional_info": {
+          "items": items
+                  ?.map(
+                    (item) => item.toMap(),
+                  )
+                  .toList() ??
+              [],
+        }
       };
 
       final result = await request.post(
@@ -155,12 +157,14 @@ class PaymentRepository {
       "description": description ?? "",
       "payment_method_id": 'pix',
       "payer": payer,
-      "items": items
-              ?.map(
-                (item) => item.toMap(),
-              )
-              .toList() ??
-          [],
+      "additional_info": {
+        "items": items
+                ?.map(
+                  (item) => item.toMap(),
+                )
+                .toList() ??
+            [],
+      }
     };
 
     final result = await request.post(
