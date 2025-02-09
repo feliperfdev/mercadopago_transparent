@@ -19,5 +19,14 @@ class PaymentItem {
         'description': productDescription ?? '',
         'quantity': quantity,
         'unit_price': price,
+        'picture_url': '',
+        'category_id': 'electronics',
+        'type': 'electronics',
+        'event_date': DateTime.now().toLocal().toIso8601String(),
+        'warranty': false,
+        'category_descriptor': {
+          'passenger': {},
+          'route': {},
+        }
       };
 }
