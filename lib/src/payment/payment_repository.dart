@@ -4,16 +4,18 @@ import 'package:mercadopago_transparent/src/request_repository.dart';
 
 import 'payment_item.dart';
 
-class PaymentRepository {
-  final request = Request();
-  final String acessToken;
+final class PaymentRepository {
+  final Request request;
+  final String accessToken;
 
-  PaymentRepository({required this.acessToken});
+  PaymentRepository({required this.accessToken, required this.request});
 
   Future<Payment> get({required String id}) async {
     try {
-      final result =
-          await request.get(path: "v1/payments/$id", acessToken: acessToken);
+      final result = await request.get(
+        path: "v1/payments/$id",
+        accessToken: accessToken,
+      );
       final payment = Payment.fromJson(result);
 
       return payment;
@@ -25,11 +27,14 @@ class PaymentRepository {
   ///Retorna os métodos de pagamento disponíveis.
   Future<List<MethodsPayment>> paymentMethods() async {
     try {
-      final result =
-          await request.get(path: "v1/payment_methods", acessToken: acessToken);
+      final result = await request.get(
+        path: "v1/payment_methods",
+        accessToken: accessToken,
+      );
 
       final methods = List<MethodsPayment>.from(
-          result.map((metd) => MethodsPayment.fromJson(metd)).toList());
+        result.map((metd) => MethodsPayment.fromJson(metd)).toList(),
+      );
       return methods;
     } catch (e) {
       return throw e;
@@ -43,50 +48,43 @@ class PaymentRepository {
   ///
   ///Caso contrário, é obrigatório o preenchimento de todas as demais informações do cliente
   ///[email], [name], [docNumber].
-  Future<Payment> creditCard(
-      {String? clientId,
-      String? idempotencyKey,
-      List<PaymentItem>? items,
-      required String tokenCard,
-      required double amount,
-      String? description,
-      String? paymentMethodId,
-      String? issuer,
-      String? name,
-      String? email,
-      String? docNumber}) async {
+  Future<Payment> creditCard({
+    String? clientId,
+    String? idempotencyKey,
+    List<PaymentItem>? items,
+    required String tokenCard,
+    required double amount,
+    String? description,
+    String? paymentMethodId,
+    String? issuer,
+    String? name,
+    String? email,
+    String? docNumber,
+  }) async {
     try {
-      final payer = clientId != null
-          ? {'type': "customer", 'id': clientId}
-          : {
-              "email": email,
-              "first_name": name!.split(' ').first,
-              "last_name": name.split(' ').last,
-              "identification": {"type": 'CPF', "number": docNumber},
-            };
-
-      final obj = {
-        'transaction_amount': amount,
-        'token': tokenCard,
-        'description': description,
-        'installments': 1,
-        'payment_method_id': paymentMethodId,
-        'issuer_id': issuer,
-        'payer': payer,
-        "additional_info": {
-          "items": items
-                  ?.map(
-                    (item) => item.toMap(),
-                  )
-                  .toList() ??
-              [],
-        }
-      };
-
       final result = await request.post(
         path: 'v1/payments',
-        acessToken: acessToken,
-        data: obj,
+        accessToken: accessToken,
+        data: {
+          'transaction_amount': amount,
+          'token': tokenCard,
+          'description': description,
+          'installments': 1,
+          'payment_method_id': paymentMethodId,
+          'issuer_id': issuer,
+          'payer':
+              clientId != null
+                  ? {'type': "customer", 'id': clientId}
+                  : {
+                    "email": email,
+                    "first_name": name!.split(' ').first,
+                    "last_name": name.split(' ').last,
+                    "identification": {"type": 'CPF', "number": docNumber},
+                  },
+          "additional_info": {
+            "items": items?.map((item) => item.toMap()).toList() ?? [],
+          },
+        },
         idempotencyKey: idempotencyKey,
       );
 
@@ -98,34 +96,32 @@ class PaymentRepository {
   }
 
   ///Pagamento em boleto
-  Future<Payment> ticket(
-      {String? description,
-      String? clientId,
-      String? idempotencyKey,
-      required double amount,
-      required String name,
-      required String email,
-      required String docNumber}) async {
-    final payer = clientId != null
-        ? {'type': "customer", 'id': clientId}
-        : {
-            "email": email,
-            "first_name": name.split(' ').first,
-            "last_name": name.split(' ').last,
-            "identification": {"type": 'CPF', "number": docNumber},
-          };
-
-    var data = {
-      "transaction_amount": amount,
-      "description": description ?? "",
-      "payment_method_id": 'bolbradesco',
-      "payer": payer
-    };
-
+  Future<Payment> ticket({
+    String? description,
+    String? clientId,
+    String? idempotencyKey,
+    required double amount,
+    required String name,
+    required String email,
+    required String docNumber,
+  }) async {
     final result = await request.post(
       path: 'v1/payments',
-      acessToken: acessToken,
-      data: data,
+      accessToken: accessToken,
+      data: {
+        "transaction_amount": amount,
+        "description": description ?? "",
+        "payment_method_id": 'bolbradesco',
+        "payer":
+            clientId != null
+                ? {'type': "customer", 'id': clientId}
+                : {
+                  "email": email,
+                  "first_name": name.split(' ').first,
+                  "last_name": name.split(' ').last,
+                  "identification": {"type": 'CPF', "number": docNumber},
+                },
+      },
       idempotencyKey: idempotencyKey,
     );
 
@@ -134,43 +130,36 @@ class PaymentRepository {
   }
 
   ///Pagamento através de PIX
-  Future<Payment> pix(
-      {String? description,
-      String? clientId,
-      String? idempotencyKey,
-      List<PaymentItem>? items,
-      required double amount,
-      required String name,
-      required String email,
-      required String docNumber}) async {
-    final payer = clientId != null
-        ? {'type': "customer", 'id': clientId}
-        : {
-            "email": email,
-            "first_name": name.split(' ').first,
-            "last_name": name.split(' ').last,
-            "identification": {"type": 'CPF', "number": docNumber},
-          };
-
-    final data = {
-      "transaction_amount": amount,
-      "description": description ?? "",
-      "payment_method_id": 'pix',
-      "payer": payer,
-      "additional_info": {
-        "items": items
-                ?.map(
-                  (item) => item.toMap(),
-                )
-                .toList() ??
-            [],
-      }
-    };
-
+  Future<Payment> pix({
+    String? description,
+    String? clientId,
+    String? idempotencyKey,
+    List<PaymentItem>? items,
+    required double amount,
+    required String name,
+    required String email,
+    required String docNumber,
+  }) async {
     final result = await request.post(
       path: 'v1/payments',
-      acessToken: acessToken,
-      data: data,
+      accessToken: accessToken,
+      data: {
+        "transaction_amount": amount,
+        "description": description ?? "",
+        "payment_method_id": 'pix',
+        "payer":
+            clientId != null
+                ? {'type': "customer", 'id': clientId}
+                : {
+                  "email": email,
+                  "first_name": name.split(' ').first,
+                  "last_name": name.split(' ').last,
+                  "identification": {"type": 'CPF', "number": docNumber},
+                },
+        "additional_info": {
+          "items": items?.map((item) => item.toMap()).toList() ?? [],
+        },
+      },
       idempotencyKey: idempotencyKey,
     );
 

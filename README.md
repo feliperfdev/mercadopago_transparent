@@ -37,7 +37,7 @@ import 'package:mercadopago_transparent/mercadopago_transparent.dart'
     as mercadopago;
 
 final mercado =
-      mercadopago.MercadoPago(acessToken: 'ACESS_TOKEN', publicKey: 'PUBLIC_KEY', applicationId: '');
+      mercadopago.MercadoPago(accessToken: 'ACESS_TOKEN', publicKey: 'PUBLIC_KEY', applicationId: '');
 ```
 > Tokenizing a card:
 

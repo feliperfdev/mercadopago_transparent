@@ -4,11 +4,10 @@ version: 1.0.1
 homepage: https://github.com/WashingtonInoveApps/mercadopago_transparent
 
 environment:
-  sdk: '>=2.12.0 <3.0.0'
-  flutter: ">=1.17.0"
+  sdk: ^3.7.2
 
 dependencies:
-  dio: ^4.0.0
+  dio: ^5.8.0
   flutter:
     sdk: flutter
 

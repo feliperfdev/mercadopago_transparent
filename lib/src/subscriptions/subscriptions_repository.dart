@@ -2,10 +2,10 @@ import 'package:mercadopago_transparent/src/request_repository.dart';
 import 'package:mercadopago_transparent/src/subscriptions/subscriptions_model.dart';
 
 class SubscriptionsRepository {
-  final String acessToken;
-  final request = Request();
+  final String accessToken;
+  final Request request;
 
-  SubscriptionsRepository({required this.acessToken});
+  SubscriptionsRepository({required this.accessToken, required this.request});
 
   ///Cria um plano para assinatura.
   ///
@@ -20,37 +20,39 @@ class SubscriptionsRepository {
   ///
   ///[token] - Token gerado pela tokenização do cartão.
   ///
-  ///Mais informações: https://www.mercadopago.com.br/developers/pt/guides/online-payments/subscriptions/integration
-  Future<Subscriptions> create(
-      {String? externalReference,
-      required String description,
-      required int frequency,
-      required String token,
-      required String type,
-      required dynamic email,
-      int? periodFree,
-      int? repetition,
-      required double amount}) async {
+  ///Mais informações: https://www.mercadopago.com.br/developers/pt/reference/subscriptions/
+  Future<Subscriptions> create({
+    String? externalReference,
+    required String description,
+    required int frequency,
+    required String token,
+    required String type,
+    required dynamic email,
+    int? periodFree,
+    int? repetition,
+    required double amount,
+  }) async {
     try {
-      final data = {
-        "reason": description,
-        "auto_recurring": {
-          "frequency": 1,
-          "frequency_type": type,
-          "transaction_amount": amount,
-          "currency_id": "BRL",
-          "repetitions": repetition
-        },
-        "back_url": "https://www.mercadopago.com.br/",
-        "external_reference": externalReference ?? "",
-        "card_token_id": token,
-        "payer_email": email,
-        "status": "authorized",
-        "free_trial": {"frequency_type": type, "frequency": periodFree ?? 0}
-      };
-
       final result = await request.post(
-          path: 'preapproval', acessToken: acessToken, data: data);
+        path: 'preapproval',
+        accessToken: accessToken,
+        data: {
+          "reason": description,
+          "auto_recurring": {
+            "frequency": frequency,
+            "frequency_type": type,
+            "transaction_amount": amount,
+            "currency_id": "BRL",
+            "repetitions": repetition,
+          },
+          "back_url": "https://www.mercadopago.com.br/",
+          "external_reference": externalReference ?? "",
+          "card_token_id": token,
+          "payer_email": email,
+          "status": "authorized",
+          "free_trial": {"frequency_type": type, "frequency": periodFree ?? 0},
+        },
+      );
 
       final subscription = Subscriptions.fromJson(result);
       return subscription;
@@ -61,13 +63,16 @@ class SubscriptionsRepository {
 
   Future<List<Subscriptions>> search({String? email}) async {
     try {
-      final path = email != null
-          ? 'preapproval/search?email=$email'
-          : 'preapproval/search';
-      final result = await request.get(path: path, acessToken: acessToken);
-      final search = List<Subscriptions>.from(result["results"]
-          .map((sub) => Subscriptions.fromJson(sub, options: true))
-          .toList());
+      final path =
+          email != null
+              ? 'preapproval/search?email=$email'
+              : 'preapproval/search';
+      final result = await request.get(path: path, accessToken: accessToken);
+      final search = List<Subscriptions>.from(
+        result["results"]
+            .map((sub) => Subscriptions.fromJson(sub, options: true))
+            .toList(),
+      );
 
       return search;
     } catch (e) {
@@ -78,8 +83,10 @@ class SubscriptionsRepository {
   ///Essa função busca informações de uma inscrição específica.
   Future<Subscriptions> get({required String id}) async {
     try {
-      final result =
-          await request.get(path: 'preapproval/$id', acessToken: acessToken);
+      final result = await request.get(
+        path: 'preapproval/$id',
+        accessToken: accessToken,
+      );
       final subs = Subscriptions.fromJson(result);
       return subs;
     } catch (e) {
@@ -88,13 +95,16 @@ class SubscriptionsRepository {
   }
 
   ///Essa função atualiza as informações do cartão através de um novo [token].
-  Future<Subscriptions> updateCard(
-      {required String token, required String id}) async {
+  Future<Subscriptions> updateCard({
+    required String token,
+    required String id,
+  }) async {
     try {
       final result = await request.put(
-          path: 'preapproval/$id',
-          acessToken: acessToken,
-          data: {"card_token_id": token});
+        path: 'preapproval/$id',
+        accessToken: accessToken,
+        data: {"card_token_id": token},
+      );
 
       final subs = Subscriptions.fromJson(result);
       return subs;
@@ -107,9 +117,10 @@ class SubscriptionsRepository {
   Future<Subscriptions> cancel({required String id}) async {
     try {
       final result = await request.put(
-          path: 'preapproval/$id',
-          acessToken: acessToken,
-          data: {"status": "cancelled"});
+        path: 'preapproval/$id',
+        accessToken: accessToken,
+        data: {"status": "cancelled"},
+      );
 
       final subs = Subscriptions.fromJson(result);
       return subs;
@@ -122,12 +133,12 @@ class SubscriptionsRepository {
   Future<Subscriptions> pause({required String id}) async {
     try {
       final result = await request.put(
-          path: 'preapproval/$id',
-          acessToken: acessToken,
-          data: {"status": "paused"});
+        path: 'preapproval/$id',
+        accessToken: accessToken,
+        data: {"status": "paused"},
+      );
 
-      final subs = Subscriptions.fromJson(result);
-      return subs;
+      return Subscriptions.fromJson(result);
     } catch (e) {
       return throw e;
     }
@@ -137,12 +148,12 @@ class SubscriptionsRepository {
   Future<Subscriptions> active({required String id}) async {
     try {
       final result = await request.put(
-          path: 'preapproval/$id',
-          acessToken: acessToken,
-          data: {"status": "authorized"});
+        path: 'preapproval/$id',
+        accessToken: accessToken,
+        data: {"status": "authorized"},
+      );
 
-      final subs = Subscriptions.fromJson(result);
-      return subs;
+      return Subscriptions.fromJson(result);
     } catch (e) {
       return throw e;
     }
